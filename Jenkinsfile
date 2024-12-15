@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE_NAME = 'domwil1208/cw2-server:1.0'
         DOCKERHUB_CREDENTIALS = 'dockerhub-credentials-id'
+        KUBECONFIG = credentials('kubeconfig-credentials-id')
     }
 
     stages {
@@ -50,7 +51,7 @@ pipeline {
                 script {
                     // Run kubectl commands to deploy the app
                     sh '''
-                        kubectl create deployment domwil-1208-cw2server --image=domwil1208/cw2-server:1.0 --replicas=3
+                        kubectl create deployment domwil-1208-cw2server --image=domwil1208/cw2-server:1.0
 
                         kubectl expose deployment domwil-1208-cw2server --type=LoadBalancer --port=80 --name=domwil-1208-cw2server-service
                     '''
