@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 // Pull the latest code from the GitHub repository
-                git 'https://github.com/domwil1208/Devops-Coursework-2-DW.git'
+                git branch: 'main', url: 'https://github.com/domwil1208/Devops-Coursework-2-DW.git'
             }
         }
 
