@@ -50,16 +50,14 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Run kubectl commands to deploy the app
-                    sh '''
-                        export KUBECONFIG=Devops-Coursework-2-DW/kube/config
-
+                    withCredentials([file(credentialsId: 'kubeconfig-credential-id', variable: 'KUBECONFIG')]) {
+                        sh '''
+                        echo "Using KUBECONFIG from credential
                         kubectl delete deployment domwil-1208-cw2server --ignore-not-found=true
-                        
                         kubectl create deployment domwil-1208-cw2server --image=domwil1208/cw2-server:1.0
-
                         kubectl expose deployment domwil-1208-cw2server --type=LoadBalancer --port=80 --name=domwil-1208-cw2server-service
-                    '''
+                         '''
+                    }
                 }
             }
         }
