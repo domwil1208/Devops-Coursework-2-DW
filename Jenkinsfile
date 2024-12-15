@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE_NAME = 'domwil1208/cw2-server:1.0'
         DOCKERHUB_CREDENTIALS = 'dockerhub-credentials-id'
+        KUBECONFIG = credentials('kubeconfig-credentials-id')
     }
 
     stages {
