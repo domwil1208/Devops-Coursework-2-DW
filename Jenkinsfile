@@ -2,17 +2,15 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "domwil1208/cw2-server:1.0"
-        KUBE_DEPLOYMENT = "domwil-1208-cw2server"
-        DOCKER_CREDENTIALS_ID = "dockerhub-credentials-id"
-        KUBECONFIG = credentials('kubeconfig-credentials-id')
+        DOCKER_IMAGE_NAME = 'domwil1208/cw2-server:1.0'
+        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials-id'
+        KUBE_CONFIG_PATH = '~/.kube/config'
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout Code') {
             steps {
-                // Pull the latest code from GitHub
-                git branch: 'main', url: 'https://github.com/domwil1208/Devops-Coursework-2-DW.git'
+                git 'https://github.com/domwil1208/Devops-Coursework-2-DW.git'
             }
         }
 
@@ -20,7 +18,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    sh "docker build -t ${DOCKER_IMAGE} ."
+                    docker.build(DOCKER_IMAGE_NAME)
                 }
             }
         }
@@ -28,14 +26,18 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    // Launch a test container and verify it runs successfully
-                    sh """
-                    docker run --name test-container -d ${DOCKER_IMAGE}
-                    sleep 5  # Wait for the container to initialize
-                    docker exec test-container echo 'Container launched successfully'
-                    docker stop test-container
-                    docker rm test-container
-                    """
+                    // Run the container and execute a test command to verify the container works
+                    def image = docker.image(DOCKER_IMAGE_NAME)
+                    image.run('-d')  // Run the container in detached mode
+                    def containerId = image.id
+                    echo "Container ID: ${containerId}"
+                    
+                    // Run a simple command inside the container to ensure it is running
+                    def result = sh(script: "docker exec ${containerId} echo 'Container is running!'", returnStdout: true).trim()
+                    echo "Container Test Result: ${result}"
+                    
+                    // Stop the container
+                    sh "docker stop ${containerId}"
                 }
             }
         }
@@ -43,9 +45,8 @@ pipeline {
         stage('Push Docker Image to DockerHub') {
             steps {
                 script {
-                    // Push the image to DockerHub
-                    withDockerRegistry(credentialsId: "${DOCKER_CREDENTIALS_ID}", url: "") {
-                        sh "docker push ${DOCKER_IMAGE}"
+                    docker.withRegistry('https://hub.docker.com', DOCKERHUB_CREDENTIALS) {
+                        docker.image(DOCKER_IMAGE_NAME).push()
                     }
                 }
             }
@@ -54,11 +55,11 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Deploy the image to Kubernetes
-                    sh """
-                    kubectl set image deployment/${KUBE_DEPLOYMENT} app-container=${DOCKER_IMAGE} --kubeconfig=${KUBECONFIG}
-                    kubectl rollout status deployment/${KUBE_DEPLOYMENT} --kubeconfig=${KUBECONFIG}
-                    """
+                    // Ensure kubectl is available (Minikube setup)
+                    sh 'kubectl config use-context minikube'  // Adjust if using a different context
+
+                    // Apply the deployment YAML file to Kubernetes
+                    sh 'kubectl apply -f k8s/deployment.yaml'  // Ensure this path points to your Kubernetes YAML
                 }
             }
         }
@@ -66,10 +67,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully.'
+            echo 'Build, Test, and Deploy Successful!'
         }
         failure {
-            echo 'Pipeline failed. Check logs for details.'
+            echo 'Something went wrong, please check the logs.'
         }
     }
 }
