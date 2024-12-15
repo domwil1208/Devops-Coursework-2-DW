@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         DOCKER_IMAGE_NAME = 'domwil1208/cw2-server:1.0'
-        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials-id'  // Updated to use Jenkins credentials
-        KUBE_CONFIG_PATH = '/path/to/kube/config'  // Path to kubectl config (minikube or AWS EKS)
+        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials-id'
+        KUBE_CONFIG_PATH = '~/.kube/config'
     }
 
     stages {
