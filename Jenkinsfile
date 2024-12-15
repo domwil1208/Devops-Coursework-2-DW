@@ -56,11 +56,9 @@ pipeline {
        stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Ensure kubectl is available (Minikube setup)
-                    sh 'kubectl config use-context minikube'  // Adjust if using a different context
 
                     // Apply the deployment YAML file to Kubernetes
-                    sh 'kubectl apply -f k8s/deployment.yaml'  // Ensure this path points to your Kubernetes YAML
+                    sh 'kubectl apply -f k8s/deployment.yaml'
                 }
             }
         }
