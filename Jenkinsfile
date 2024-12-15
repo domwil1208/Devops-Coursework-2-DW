@@ -53,6 +53,7 @@ pipeline {
                         sh '''
                             export KUBECONFIG="$KUBECONFIG"
                             echo "Using KUBECONFIG from credentials"
+                            kubectl get nodes
                             
                             kubectl delete deployment domwil-1208-cw2server --ignore-not-found=true
 
