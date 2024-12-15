@@ -51,6 +51,8 @@ pipeline {
                 script {
                     // Run kubectl commands to deploy the app
                     sh '''
+                        kubectl delete deployment domwil-1208-cw2server --ignore-not-found=true
+                        
                         kubectl create deployment domwil-1208-cw2server --image=domwil1208/cw2-server:1.0
 
                         kubectl expose deployment domwil-1208-cw2server --type=LoadBalancer --port=80 --name=domwil-1208-cw2server-service
