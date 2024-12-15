@@ -41,23 +41,19 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to DockerHub') {
+       stage('Push to DockerHub') {
             steps {
                 script {
-                    // Use Jenkins credentials to login to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
-                    }
-
-                    // Push the image to DockerHub
-                    docker.withRegistry('https://hub.docker.com', DOCKERHUB_CREDENTIALS) {
-                        docker.image(DOCKER_IMAGE_NAME).push()
+                    // Log in and push the image to DockerHub
+                    withDockerRegistry(credentialsId: "${DOCKERHUB_CREDENTIALS}", url: "") {
+                        sh "docker push ${DOCKER_IMAGE_NAME}"
                     }
                 }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+
+       stage('Deploy to Kubernetes') {
             steps {
                 script {
                     // Ensure kubectl is available (Minikube setup)
