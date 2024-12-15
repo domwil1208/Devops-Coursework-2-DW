@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/domwil1208/Devops-Coursework-2-DW.git'
+                git branch: 'main', url: 'https://github.com/domwil1208/Devops-Coursework-2-DW.git'
             }
         }
 
