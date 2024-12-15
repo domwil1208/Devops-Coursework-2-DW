@@ -12,7 +12,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Pull the latest code from GitHub
-                git branch: 'main', url: 'https://github.com/domwil1208/Devops-Coursework-2-DW.git'
+                git branch: 'main', url: 'git@github.com:domwil1208/Devops-Coursework-2-DW.git'
             }
         }
 
