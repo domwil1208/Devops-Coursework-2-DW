@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE_NAME = 'domwil1208/cw2-server:1.0'
         DOCKERHUB_CREDENTIALS = 'dockerhub-credentials-id'
-        KUBECONFIG =Devops-Coursework-2-DW/kube/config
+        KUBECONFIG = credentials('kubeconfig-credentials-id')
 
     }
 
@@ -52,6 +52,8 @@ pipeline {
                 script {
                     // Run kubectl commands to deploy the app
                     sh '''
+                        export KUBECONFIG=Devops-Coursework-2-DW/kube/config
+
                         kubectl delete deployment domwil-1208-cw2server --ignore-not-found=true
                         
                         kubectl create deployment domwil-1208-cw2server --image=domwil1208/cw2-server:1.0
