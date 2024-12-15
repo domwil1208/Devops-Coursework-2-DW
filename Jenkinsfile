@@ -3,14 +3,14 @@ pipeline {
 
     environment {
         DOCKER_IMAGE_NAME = 'domwil1208/cw2-server:1.0'
-        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials-id'  // Jenkins credentials for Docker Hub
+        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials-id'  // Updated to use Jenkins credentials
         KUBE_CONFIG_PATH = '/path/to/kube/config'  // Path to kubectl config (minikube or AWS EKS)
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Pull the latest code from the GitHub repository
+                // Checkout the 'main' branch from the GitHub repository
                 git branch: 'main', url: 'https://github.com/domwil1208/Devops-Coursework-2-DW.git'
             }
         }
@@ -44,6 +44,11 @@ pipeline {
         stage('Push Docker Image to DockerHub') {
             steps {
                 script {
+                    // Use Jenkins credentials to login to Docker Hub
+                    withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                    }
+
                     // Push the image to DockerHub
                     docker.withRegistry('https://hub.docker.com', DOCKERHUB_CREDENTIALS) {
                         docker.image(DOCKER_IMAGE_NAME).push()
